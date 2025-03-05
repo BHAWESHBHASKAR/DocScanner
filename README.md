@@ -4,7 +4,10 @@ A modern web application that uses AI to detect similarities between documents, 
 
 ## 🎥 Demo
 
-https://user-images.githubusercontent.com/YOUR_USER_ID/DocScanner/assets/demo/Screencast-2025-03-06-01-45-41.mp4
+https://github.com/BHAWESHBHASKAR/DocScanner/assets/demo/Screencast-2025-03-06-01-45-41.mp4
+
+<video src="https://github.com/BHAWESHBHASKAR/DocScanner/assets/demo/Screencast-2025-03-06-01-45-41.mp4" controls="controls" style="max-width: 730px;">
+</video>
 
 Watch the demo video above to see how to use the application.
 

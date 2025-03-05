@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Matches - Document Scanner{% endblock %}
+
+{% block content %}
+<section class="document-view">
+    <h2>Matches for: {{ document.title }}</h2>
+    
+    <div class="document-meta-info">
+        <p><strong>Uploaded:</strong> {{ document.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><strong>Owner:</strong> {{ document.owner.username }}</p>
+    </div>
+    
+    <div class="matches-section">
+        <h3>All Similar Documents</h3>
+        
+        {% if matches %}
+            <div class="match-list">
+                {% for match in matches %}
+                    {% set matched_doc = match.matched_document %}
+                    {% set score = match.similarity_score %}
+                    
+                    <div class="match-card">
+                        <div class="match-info">
+                            <h4>{{ matched_doc.title }}</h4>
+                            <p>Uploaded by {{ matched_doc.owner.username }} on {{ matched_doc.created_at.strftime('%Y-%m-%d') }}</p>
+                            <div id="similarity-{{ match.id }}" class="similarity-visualization"></div>
+                        </div>
+                        
+                        <div class="match-actions">
+                            <div class="match-score {% if score >= 0.7 %}high{% elif score >= 0.5 %}medium{% else %}low{% endif %}">
+                                {{ "%.2f"|format(score * 100) }}% Match
+                            </div>
+                            <a href="{{ url_for('document.view', doc_id=matched_doc.id) }}" class="btn small-btn">View Document</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No similar documents found.</p>
+        {% endif %}
+    </div>
+    
+    <div class="match-explanation">
+        <h3>How Similarity is Calculated</h3>
+        <p>Our system uses a combination of traditional text similarity algorithms and AI-powered semantic analysis to determine how similar documents are to each other.</p>
+        
+        <div class="similarity-methods">
+            <div class="similarity-method">
+                <h4>Text-Based Similarity</h4>
+                <p>Analyzes word frequency, document structure, and text patterns to find similarities.</p>
+            </div>
+            
+            <div class="similarity-method">
+                <h4>AI-Powered Semantic Analysis</h4>
+                <p>Uses DeepSeek AI to understand the meaning and context of documents, providing more accurate matching.</p>
+            </div>
+        </div>
+        
+        <div class="similarity-legend">
+            <h4>Similarity Score Legend</h4>
+            <ul>
+                <li><span class="score-indicator high"></span> 70-100%: High similarity</li>
+                <li><span class="score-indicator medium"></span> 50-69%: Medium similarity</li>
+                <li><span class="score-indicator low"></span> 0-49%: Low similarity</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="document-actions">
+        <a href="{{ url_for('document.view', doc_id=document.id) }}" class="btn secondary-btn">Back to Document</a>
+        <a href="{{ url_for('user.profile') }}" class="btn secondary-btn">Back to Profile</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Visualize similarity scores
+        {% for match in matches %}
+            visualizeSimilarity('similarity-{{ match.id }}', {{ match.similarity_score }});
+        {% endfor %}
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .similarity-legend {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    
+    .similarity-legend ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .similarity-legend li {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .score-indicator {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 3px;
+        margin-right: 10px;
+    }
+    
+    .score-indicator.high {
+        background-color: #28a745;
+    }
+    
+    .score-indicator.medium {
+        background-color: #ffc107;
+    }
+    
+    .score-indicator.low {
+        background-color: #dc3545;
+    }
+    
+    .similarity-methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .similarity-method {
+        padding: 15px;
+        background-color: #f0f4f8;
+        border-radius: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .similarity-methods {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

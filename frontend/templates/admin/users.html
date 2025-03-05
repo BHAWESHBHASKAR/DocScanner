@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard">
+    <h2>Manage Users</h2>
+    
+    <div class="user-filters">
+        <input type="text" id="user-search" placeholder="Search by username or email" class="search-input">
+        <select id="role-filter" class="filter-select">
+            <option value="all">All Roles</option>
+            <option value="user">Regular Users</option>
+            <option value="admin">Admins</option>
+        </select>
+    </div>
+    
+    <div class="user-list">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Credits</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr data-role="{{ user.role }}">
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ user.credits }}</td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.user_detail', user_id=user.id) }}" class="btn small-btn">View Details</a>
+                            <button class="btn small-btn adjust-credits-btn" data-user-id="{{ user.id }}" data-username="{{ user.username }}" data-credits="{{ user.credits }}">Adjust Credits</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Modal for adjusting credits -->
+    <div id="credits-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Adjust Credits for <span id="modal-username"></span></h3>
+            <form id="adjust-credits-form" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="credits-amount">New Credit Amount</label>
+                    <input type="number" id="credits-amount" name="amount" min="0" max="100" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary-btn">Save Changes</button>
+                    <button type="button" class="btn secondary-btn close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn secondary-btn">Back to Dashboard</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userSearch = document.getElementById('user-search');
+        const roleFilter = document.getElementById('role-filter');
+        const userRows = document.querySelectorAll('.user-table tbody tr');
+        const modal = document.getElementById('credits-modal');
+        const modalUsername = document.getElementById('modal-username');
+        const adjustCreditsForm = document.getElementById('adjust-credits-form');
+        const creditsInput = document.getElementById('credits-amount');
+        const closeModalBtn = document.querySelector('.close-modal');
+        const closeModalBtnSecondary = document.querySelector('.close-modal-btn');
+        
+        // Search functionality
+        userSearch.addEventListener('input', filterUsers);
+        roleFilter.addEventListener('change', filterUsers);
+        
+        function filterUsers() {
+            const searchTerm = userSearch.value.toLowerCase();
+            const roleValue = roleFilter.value;
+            
+            userRows.forEach(row => {
+                const username = row.children[1].textContent.toLowerCase();
+                const email = row.children[2].textContent.toLowerCase();
+                const role = row.getAttribute('data-role');
+                
+                const matchesSearch = username.includes(searchTerm) || email.includes(searchTerm);
+                const matchesRole = roleValue === 'all' || role === roleValue;
+                
+                row.style.display = matchesSearch && matchesRole ? '' : 'none';
+            });
+        }
+        
+        // Modal functionality
+        document.querySelectorAll('.adjust-credits-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-user-id');
+                const username = this.getAttribute('data-username');
+                const currentCredits = this.getAttribute('data-credits');
+                
+                modalUsername.textContent = username;
+                creditsInput.value = currentCredits;
+                adjustCreditsForm.action = `/admin/users/${userId}/adjust-credits`;
+                modal.style.display = 'block';
+            });
+        });
+        
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        closeModalBtnSecondary.addEventListener('click', closeModal);
+        
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-filters {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .filter-select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        position: relative;
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 5px;
+        max-width: 500px;
+    }
+    
+    .close-modal {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .close-modal:hover {
+        color: #666;
+    }
+</style>
+{% endblock %}

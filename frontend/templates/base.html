@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional document scanning and matching system for enterprise use">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}Document Scanner{% endblock %} | Enterprise Solution</title>
+    <!-- Google Fonts - Modern Sans Serif -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/glassmorphism.css') }}">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%232563eb' d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM17.9 21H6.1c-.06 0-.1-.04-.1-.1V3.1c0-.06.04-.1.1-.1h5.4v6.5c0 .83.67 1.5 1.5 1.5h6.5v9.9c0 .06-.04.1-.1.1z'/%3E%3Cpath fill='%232563eb' d='M9.5 14.5h5c.28 0 .5.22.5.5s-.22.5-.5.5h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5zm0 2h5c.28 0 .5.22.5.5s-.22.5-.5.5h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5zm0 2h5c.28 0 .5.22.5.5s-.22.5-.5.5h-5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5z'/%3E%3C/svg%3E">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Modern Background Gradient -->
+    <div class="bg-gradient"></div>
+    <div class="bg-gradient-overlay"></div>
+    
+    <!-- Notifications Container with Enhanced Positioning -->
+    <div class="notifications-container"></div>
+    
+    <!-- Loading Indicator -->
+    <div class="page-loader">
+        <div class="loader-spinner"></div>
+    </div>
+    
+    <header class="glass-nav">
+        <nav class="container">
+            <div class="logo">
+                <h1><i class="fas fa-file-search"></i> DocScanner</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}" class="nav-link"><i class="fas fa-home"></i> <span class="nav-text">Home</span></a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('document.upload') }}" class="nav-link"><i class="fas fa-file-upload"></i> <span class="nav-text">Scan Document</span></a></li>
+                    <li><a href="{{ url_for('user.profile') }}" class="nav-link"><i class="fas fa-user"></i> <span class="nav-text">Profile</span></a></li>
+                    {% if current_user.role == 'admin' %}
+                        <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link"><i class="fas fa-chart-line"></i> <span class="nav-text">Dashboard</span></a></li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ url_for('auth.logout') }}" class="nav-link">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="nav-text">{{ current_user.username }}</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}" class="nav-link"><i class="fas fa-sign-in-alt"></i> <span class="nav-text">Login</span></a></li>
+                    <li><a href="{{ url_for('auth.register') }}" class="glass-btn primary"><i class="fas fa-user-plus"></i> <span class="nav-text">Register</span></a></li>
+                {% endif %}
+            </ul>
+            
+            <!-- Modern Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message {{ category }} fade-in">
+                                {{ message }}
+                                <button class="close-btn">&times;</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <footer class="glass-card footer-modern">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2><i class="fas fa-file-search"></i> DocScanner</h2>
+                    <p>Professional document scanning and matching system</p>
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/bhawesh-bhaskar" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/BHAWESHBHASKAR" class="social-link" target="_blank"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('document.upload') }}">Scan Document</a></li>
+                        <li><a href="{{ url_for('user.profile') }}">Profile</a></li>
+                        <li><a href="#">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact</h3>
+                    <p><i class="fas fa-envelope"></i> bhaskarbhawesh09@gmail.com</p>
+                    <p><i class="fas fa-phone"></i> +91 7321080882</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Document Scanner. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Core JS -->
+    <script src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/user-menu.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/icon-system.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/responsive-grid.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/drag-drop.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/upload-form.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui-enhancements.js') }}"></script>
+    
+    <script>
+        // Initialize loading indicator
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flash message handling
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                const closeBtn = message.querySelector('.close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        message.classList.add('fade-out');
+                        setTimeout(() => {
+                            message.remove();
+                        }, 300);
+                    });
+                }
+                
+                // Auto-hide flash messages after 5 seconds
+                setTimeout(() => {
+                    message.classList.add('fade-out');
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                }, 5000);
+            });
+            
+            // Loading indicator functions
+            window.showLoader = function() {
+                document.querySelector('.page-loader').classList.add('active');
+            };
+            
+            window.hideLoader = function() {
+                document.querySelector('.page-loader').classList.remove('active');
+            };
+            
+            // Add loading indicator to forms
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    // Don't show loader for search forms or forms with no-loader class
+                    if (!this.classList.contains('search-form') && !this.classList.contains('no-loader')) {
+                        window.showLoader();
+                    }
+                });
+            });
+            
+            // Add loading indicator to links with class 'loader-link'
+            const loaderLinks = document.querySelectorAll('a.loader-link');
+            loaderLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Only show loader if it's not a download link
+                    if (!this.hasAttribute('download')) {
+                        window.showLoader();
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <!-- Page-specific JS -->
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    navLinks.classList.toggle('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

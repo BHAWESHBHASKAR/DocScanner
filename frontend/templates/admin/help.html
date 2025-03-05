@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Help - Document Scanner{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="section-header">
+        <h2><i class="fas fa-question-circle"></i> Admin Help Center</h2>
+        <div class="breadcrumb">
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> / Help
+        </div>
+    </div>
+
+    <div class="help-container">
+        <div class="help-sidebar">
+            <div class="help-search">
+                <input type="text" placeholder="Search help topics..." class="search-input">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="help-categories">
+                <h3>Categories</h3>
+                <ul>
+                    <li class="active"><a href="#getting-started">Getting Started</a></li>
+                    <li><a href="#user-management">User Management</a></li>
+                    <li><a href="#document-management">Document Management</a></li>
+                    <li><a href="#credit-system">Credit System</a></li>
+                    <li><a href="#matching-system">Matching System</a></li>
+                    <li><a href="#analytics">Analytics</a></li>
+                    <li><a href="#system-settings">System Settings</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="help-content">
+            <div class="help-section" id="getting-started">
+                <h3>Getting Started with Admin Dashboard</h3>
+                <p>Welcome to the Document Scanner Admin Dashboard! This help guide will walk you through the various features and functionalities available to you as an administrator.</p>
+                
+                <div class="help-card">
+                    <h4>Dashboard Overview</h4>
+                    <p>The dashboard provides a quick overview of your system's status, including:</p>
+                    <ul>
+                        <li>Total number of users, documents, scans, and pending requests</li>
+                        <li>Recent scan activity with visualization</li>
+                        <li>Top users by scan count and credit usage</li>
+                        <li>Recent scan logs with document details</li>
+                    </ul>
+                    <div class="help-image">
+                        <img src="{{ url_for('static', filename='images/help/dashboard-overview.png') }}" alt="Dashboard Overview">
+                    </div>
+                </div>
+                
+                <div class="help-card">
+                    <h4>Navigation</h4>
+                    <p>The admin interface includes the following main sections:</p>
+                    <ul>
+                        <li><strong>Dashboard:</strong> Overview of system statistics and activity</li>
+                        <li><strong>Users:</strong> Manage user accounts, permissions, and credits</li>
+                        <li><strong>Credit Requests:</strong> Review and approve credit requests from users</li>
+                        <li><strong>Analytics:</strong> Detailed reports and visualizations of system usage</li>
+                        <li><strong>System Settings:</strong> Configure system parameters and behavior</li>
+                        <li><strong>Export Data:</strong> Export system data in various formats</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section" id="user-management">
+                <h3>User Management</h3>
+                <p>The user management section allows you to view, edit, and manage all user accounts in the system.</p>
+                
+                <div class="help-card">
+                    <h4>Viewing Users</h4>
+                    <p>The users page displays a list of all registered users with their basic information. You can:</p>
+                    <ul>
+                        <li>Sort users by username, registration date, or activity</li>
+                        <li>Filter users by role (admin, user)</li>
+                        <li>Search for specific users by username or email</li>
+                    </ul>
+                </div>
+                
+                <div class="help-card">
+                    <h4>User Details</h4>
+                    <p>Clicking on a user will show their detailed profile, including:</p>
+                    <ul>
+                        <li>Account information (username, email, registration date)</li>
+                        <li>Activity history (document uploads, scans)</li>
+                        <li>Credit history and current balance</li>
+                        <li>Document list with metadata</li>
+                    </ul>
+                    <p>From this page, you can also:</p>
+                    <ul>
+                        <li>Edit user information</li>
+                        <li>Adjust credit balance</li>
+                        <li>Disable/enable account</li>
+                        <li>Change user role</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Additional help sections would be added here -->
+            
+            <div class="help-section" id="troubleshooting">
+                <h3>Troubleshooting</h3>
+                <p>If you encounter any issues with the admin dashboard or system functionality, here are some common solutions:</p>
+                
+                <div class="help-card">
+                    <h4>Common Issues</h4>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h5>Dashboard statistics are not updating</h5>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Try refreshing the page. If the issue persists, check the database connection status in the system settings. You may need to restart the application server.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h5>Document matching is not working correctly</h5>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Ensure that both hash matching and AI matching are enabled in system settings. Check that the similarity threshold is set appropriately (recommended: 70-80%).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h5>Users are not receiving credits after approval</h5>
+                        </div>
+                        <div class="faq-answer">
+                            <p>This could be due to a database transaction issue. Check the application logs for errors. You can manually add credits to users from the user detail page.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="help-card">
+                    <h4>Getting Support</h4>
+                    <p>If you need additional assistance, please contact our support team:</p>
+                    <ul>
+                        <li>Email: support@documentscanner.com</li>
+                        <li>Phone: +1-800-123-4567</li>
+                        <li>Support Hours: Monday-Friday, 9am-5pm EST</li>
+                    </ul>
+                    <p>Please include the following information in your support request:</p>
+                    <ul>
+                        <li>Detailed description of the issue</li>
+                        <li>Steps to reproduce the problem</li>
+                        <li>Screenshots if applicable</li>
+                        <li>System version and browser information</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Help section navigation
+        const helpLinks = document.querySelectorAll('.help-categories a');
+        helpLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                helpLinks.forEach(l => {
+                    l.parentElement.classList.remove('active');
+                });
+                
+                // Add active class to clicked link
+                this.parentElement.classList.add('active');
+                
+                // Scroll to target section
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // FAQ accordion
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                const isOpen = this.classList.contains('open');
+                
+                // Close all other answers
+                document.querySelectorAll('.faq-question.open').forEach(q => {
+                    if (q !== this) {
+                        q.classList.remove('open');
+                        q.nextElementSibling.style.maxHeight = null;
+                    }
+                });
+                
+                // Toggle current answer
+                if (!isOpen) {
+                    this.classList.add('open');
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                } else {
+                    this.classList.remove('open');
+                    answer.style.maxHeight = null;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

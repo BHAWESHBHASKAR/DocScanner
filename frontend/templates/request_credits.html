@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Credits - Document Scanner{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <h2>Request Additional Credits</h2>
+        
+        <div class="credits-info">
+            <p>You currently have <span class="credits-count">{{ current_user.credits }}</span> credits</p>
+            <p>Each user gets 20 free credits per day</p>
+            <p>Need more? Submit a request below</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('credit.request_credits') }}" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="amount">Number of Credits</label>
+                <input type="number" id="amount" name="amount" min="1" max="100" value="10" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="reason">Reason for Request</label>
+                <textarea id="reason" name="reason" rows="4" placeholder="Please explain why you need additional credits"></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn primary-btn">Submit Request</button>
+            </div>
+        </form>
+        
+        <div class="request-info">
+            <h3>About Credit Requests</h3>
+            <ul>
+                <li>Credit requests are reviewed by administrators</li>
+                <li>Approval is not guaranteed and depends on your reason</li>
+                <li>You'll be notified when your request is processed</li>
+                <li>You can check the status of your requests in your profile</li>
+            </ul>
+        </div>
+        
+        <div class="auth-links">
+            <a href="{{ url_for('user.profile') }}">Back to Profile</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

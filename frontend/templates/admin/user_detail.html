@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block title %}User Details - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard">
+    <h2>User Details: {{ user.username }}</h2>
+    
+    <div class="user-details">
+        <div class="user-info-card">
+            <h3>User Information</h3>
+            <div class="info-group">
+                <p><strong>ID:</strong> {{ user.id }}</p>
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Role:</strong> {{ user.role }}</p>
+                <p><strong>Credits:</strong> {{ user.credits }}</p>
+                <p><strong>Last Credit Reset:</strong> {{ user.last_credit_reset.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Created:</strong> {{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            
+            <div class="user-actions">
+                <form method="POST" action="{{ url_for('credit.adjust_credits', user_id=user.id) }}" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-group inline">
+                        <label for="credits-amount">Adjust Credits:</label>
+                        <input type="number" id="credits-amount" name="amount" min="0" max="100" value="{{ user.credits }}" required>
+                    </div>
+                    <button type="submit" class="btn small-btn">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-section">
+        <h3>Documents ({{ documents|length }})</h3>
+        {% if documents %}
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                        <tr>
+                            <td>{{ doc.id }}</td>
+                            <td>{{ doc.title }}</td>
+                            <td>{{ doc.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('document.view', doc_id=doc.id) }}" class="btn small-btn">View</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-state">This user has not uploaded any documents.</p>
+        {% endif %}
+    </div>
+    
+    <div class="dashboard-section">
+        <h3>Scan Logs ({{ scan_logs|length }})</h3>
+        {% if scan_logs %}
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Document</th>
+                        <th>Timestamp</th>
+                        <th>Similarity Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in scan_logs %}
+                        <tr>
+                            <td>{{ log.id }}</td>
+                            <td>{{ log.document.title }}</td>
+                            <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ "%.2f"|format(log.similarity_score * 100) }}%</td>
+                            <td>
+                                <a href="{{ url_for('document.view', doc_id=log.document_id) }}" class="btn small-btn">View Document</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-state">This user has not performed any scans.</p>
+        {% endif %}
+    </div>
+    
+    <div class="credit-requests">
+        <h3>Credit Request History</h3>
+        {% if credit_requests %}
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Amount</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Processed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in credit_requests %}
+                        <tr>
+                            <td>{{ req.id }}</td>
+                            <td>{{ req.amount }}</td>
+                            <td>{{ req.reason or 'No reason provided' }}</td>
+                            <td>
+                                <span class="status-badge {{ req.status }}">{{ req.status }}</span>
+                            </td>
+                            <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if req.approved_at %}
+                                    {{ req.approved_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if req.approved_by %}
+                                        by Admin #{{ req.approved_by }}
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if req.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for('credit.approve_request', request_id=req.id) }}" class="inline-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn small-btn approve-btn">Approve</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('credit.deny_request', request_id=req.id) }}" class="inline-form">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn small-btn deny-btn">Deny</button>
+                                    </form>
+                                {% else %}
+                                    <span class="processed-by">
+                                        {% if req.admin_id %}
+                                            Processed by Admin #{{ req.admin_id }}
+                                        {% else %}
+                                            System processed
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-state">This user has not made any credit requests.</p>
+        {% endif %}
+    </div>
+    
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.users') }}" class="btn secondary-btn">Back to Users</a>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn secondary-btn">Back to Dashboard</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-info-card {
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .info-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .user-actions {
+        padding-top: 15px;
+        border-top: 1px solid #ddd;
+    }
+    
+    .inline-form {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .form-group.inline {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 10px;
+    }
+    
+    .form-group.inline label {
+        margin-right: 10px;
+        margin-bottom: 0;
+    }
+    
+    .form-group.inline input {
+        width: 80px;
+    }
+    
+    .approve-btn {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .deny-btn {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .processed-by {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock %}

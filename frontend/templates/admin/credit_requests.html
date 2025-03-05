@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Credit Requests - Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard">
+    <h2>Manage Credit Requests</h2>
+    
+    <div class="request-filters">
+        <select id="status-filter" class="filter-select">
+            <option value="all">All Statuses</option>
+            <option value="pending" selected>Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+        </select>
+    </div>
+    
+    <div class="dashboard-section">
+        <h3>Credit Requests</h3>
+        {% if requests %}
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Processed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                        <tr data-status="{{ req.status }}" data-request-id="{{ req.id }}">
+                            <td>{{ req.id }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.user_detail', user_id=req.user_id) }}">{{ req.username }}</a>
+                            </td>
+                            <td>{{ req.amount }}</td>
+                            <td>
+                                <div class="reason-text">
+                                    {{ req.reason or 'No reason provided' }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge {{ req.status }}">{{ req.status }}</span>
+                            </td>
+                            <td>{{ req.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if req.approved_at %}
+                                    {{ req.approved_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if req.approved_by %}
+                                        by Admin #{{ req.approved_by }}
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="action-buttons">
+                                {% if req.status == 'pending' %}
+                                    <button class="btn small-btn approve-btn" data-request-id="{{ req.id }}" data-action="approve">Approve</button>
+                                    <button class="btn small-btn reject-btn" data-request-id="{{ req.id }}" data-action="reject">Reject</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty-state">No credit requests found.</p>
+        {% endif %}
+    </div>
+    
+    <div class="admin-actions">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn secondary-btn">Back to Dashboard</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Status filter functionality
+        const statusFilter = document.getElementById('status-filter');
+        const requestRows = document.querySelectorAll('.user-table tbody tr');
+        
+        function filterRequests() {
+            const statusValue = statusFilter.value;
+            
+            requestRows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                
+                row.style.display = statusValue === 'all' || status === statusValue ? '' : 'none';
+            });
+        }
+        
+        statusFilter.addEventListener('change', filterRequests);
+        
+        // Initial filter (show pending by default)
+        filterRequests();
+
+        // Handle credit request buttons
+        document.querySelectorAll('.action-buttons button').forEach(button => {
+            button.addEventListener('click', function() {
+                const requestId = this.getAttribute('data-request-id');
+                const action = this.getAttribute('data-action');
+                handleRequest(requestId, action);
+            });
+        });
+    });
+    
+    // Handle credit request approval/rejection
+    async function handleRequest(requestId, action) {
+        try {
+            const response = await fetch(`/admin/credit-requests/${requestId}/${action}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to process request');
+            }
+            
+            // Update UI
+            const row = document.querySelector(`tr[data-request-id="${requestId}"]`);
+            if (row) {
+                // Refresh the page to show updated status
+                window.location.reload();
+            }
+            
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .request-filters {
+        display: flex;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+    
+    .filter-select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .status-badge.pending {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .status-badge.approved {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .status-badge.rejected {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .reason-text {
+        max-width: 250px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .reason-text:hover {
+        white-space: normal;
+        overflow: visible;
+    }
+    
+    .approve-btn {
+        background-color: #28a745;
+        color: white;
+        margin-right: 8px;
+    }
+    
+    .reject-btn {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .processed-by {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock %}

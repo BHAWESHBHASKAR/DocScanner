@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+
+{#
+Admin Dashboard Template
+
+This template provides a comprehensive admin dashboard with:
+- Real-time statistics and metrics
+- Interactive charts and graphs
+- User activity monitoring
+- System performance indicators
+
+Author: Bhawesh Bhaskar
+Date: March 2025
+#}
+
+{% block title %}Admin Dashboard - Document Scanner{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard">
+    {# Dashboard Header with Navigation #}
+    <div class="dashboard-header">
+        <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+        <div class="dashboard-actions-top">
+            <a href="{{ url_for('admin.users') }}" class="btn secondary-btn" title="Manage Users">
+                <i class="fas fa-users"></i> Users
+            </a>
+            <a href="{{ url_for('admin.credit_requests') }}" class="btn secondary-btn" title="Handle Credit Requests">
+                <i class="fas fa-coins"></i> Credits
+            </a>
+            <a href="{{ url_for('admin.analytics') }}" class="btn primary-btn" title="View Detailed Analytics">
+                <i class="fas fa-chart-line"></i> Analytics
+            </a>
+        </div>
+    </div>
+    
+    {# Key Performance Indicators #}
+    <div class="dashboard-stats">
+        {# User Statistics Card #}
+        <div class="dashboard-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Users</h3>
+                <div class="dashboard-stat-value counter" data-target="{{ user_count }}">{{ user_count }}</div>
+                <div class="stat-change {% if user_change > 0 %}positive{% elif user_change < 0 %}negative{% else %}neutral{% endif %}">
+                    {{ user_change }}% 
+                    <i class="fas fa-arrow-{% if user_change > 0 %}up{% elif user_change < 0 %}down{% else %}right{% endif %}"></i>
+                </div>
+            </div>
+        </div>
+        
+        {# Document Statistics Card #}
+        <div class="dashboard-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Documents</h3>
+                <div class="dashboard-stat-value counter" data-target="{{ document_count }}">{{ document_count }}</div>
+                <div class="stat-change {% if document_change > 0 %}positive{% elif document_change < 0 %}negative{% else %}neutral{% endif %}">
+                    {{ document_change }}% 
+                    <i class="fas fa-arrow-{% if document_change > 0 %}up{% elif document_change < 0 %}down{% else %}right{% endif %}"></i>
+                </div>
+            </div>
+        </div>
+        
+        {# Scan Statistics Card #}
+        <div class="dashboard-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Scans</h3>
+                <div class="dashboard-stat-value counter" data-target="{{ scan_count }}">{{ scan_count }}</div>
+                <div class="stat-change {% if scan_change > 0 %}positive{% elif scan_change < 0 %}negative{% else %}neutral{% endif %}">
+                    {{ scan_change }}% 
+                    <i class="fas fa-arrow-{% if scan_change > 0 %}up{% elif scan_change < 0 %}down{% else %}right{% endif %}"></i>
+                </div>
+            </div>
+        </div>
+        
+        {# Credit Request Statistics Card #}
+        <div class="dashboard-stat-card {% if pending_requests > 0 %}highlight{% endif %}">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Pending Requests</h3>
+                <div class="dashboard-stat-value counter" data-target="{{ pending_requests }}">{{ pending_requests }}</div>
+                {% if pending_requests > 0 %}
+                    <a href="{{ url_for('admin.credit_requests') }}" class="btn small-btn" title="Review Pending Requests">
+                        <i class="fas fa-eye"></i> Review
+                    </a>
+                {% else %}
+                    <div class="stat-change {% if request_change > 0 %}positive{% elif request_change < 0 %}negative{% else %}neutral{% endif %}">
+                        {{ request_change }}% 
+                        <i class="fas fa-arrow-{% if request_change > 0 %}up{% elif request_change < 0 %}down{% else %}right{% endif %}"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {# Document Match Statistics Card #}
+        <div class="dashboard-stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-copy"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Document Matches</h3>
+                <div class="dashboard-stat-value counter" data-target="{{ match_count }}">{{ match_count }}</div>
+                <div class="stat-change positive">
+                    +{{ (scan_change * 1.2)|round(1) }}% 
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# Detailed Analytics Grid #}
+    <div class="dashboard-grid">
+        {# Scan Activity Chart Section #}
+        <div class="dashboard-section chart-section">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-area"></i> Scan Activity (Last 7 Days)</h3>
+                <div class="section-actions">
+                    <button class="btn icon-btn" id="refresh-chart" title="Refresh Chart">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn icon-btn" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="#" id="export-chart-png" title="Save Chart as Image">
+                                <i class="fas fa-image"></i> Export as PNG
+                            </a>
+                            <a href="{{ url_for('admin.export_data', data_type='scans') }}" title="Download Scan Data">
+                                <i class="fas fa-file-csv"></i> Export as CSV
+                            </a>
+                            <a href="{{ url_for('admin.analytics') }}" title="View Detailed Analytics">
+                                <i class="fas fa-chart-line"></i> View Full Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="scan-activity-chart" width="800" height="300" data-chart='{{ scan_activity }}'></canvas>
+            </div>
+        </div>
+    
+        {# Top Users by Scan Count Section #}
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h3><i class="fas fa-trophy"></i> Top Users by Scan Count</h3>
+                <div class="section-actions">
+                    <a href="{{ url_for('admin.export_data', data_type='users') }}" class="btn icon-btn" title="Export User Data">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+            </div>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Scan Count</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_id, username, scan_count in top_users_by_scans %}
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar" title="{{ username }}">{{ username[0].upper() }}</div>
+                                    <span>{{ username }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="progress-bar-container" title="Scan Count: {{ scan_count }}">
+                                    <div class="progress-bar" style="width: {{ (scan_count / top_users_by_scans[0][2]) * 100 }}%"></div>
+                                    <span>{{ scan_count }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.user_detail', user_id=user_id) }}" class="btn small-btn" title="View User Details">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    
+        {# Top Users by Credit Usage Section #}
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h3><i class="fas fa-coins"></i> Top Users by Credit Usage</h3>
+                <div class="section-actions">
+                    <a href="{{ url_for('admin.export_data', data_type='users') }}" class="btn icon-btn" title="Export User Data">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+            </div>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Credits Used</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_id, username, credits_used in top_users_by_credits %}
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar" title="{{ username }}">{{ username[0].upper() }}</div>
+                                    <span>{{ username }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="progress-bar-container" title="Credits Used: {{ credits_used }}">
+                                    <div class="progress-bar credit-bar" style="width: {{ (credits_used / top_users_by_credits[0][2]) * 100 if top_users_by_credits[0][2] > 0 else 0 }}%"></div>
+                                    <span>{{ credits_used }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.user_detail', user_id=user_id) }}" class="btn small-btn" title="View User Details">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {# Recent Scans Section #}
+    <div class="dashboard-section full-width">
+        <div class="section-header">
+            <h3><i class="fas fa-history"></i> Recent Scans</h3>
+            <div class="section-actions">
+                <div class="search-container">
+                    <input type="text" id="scan-search" placeholder="Search scans..." class="search-input" title="Search Recent Scans">
+                    <i class="fas fa-search"></i>
+                </div>
+                <button class="btn icon-btn" id="filter-scans" title="Filter Scans">
+                    <i class="fas fa-filter"></i>
+                </button>
+                <a href="{{ url_for('admin.export_data', data_type='scans') }}" class="btn icon-btn" title="Export Scan Data">
+                    <i class="fas fa-download"></i>
+                </a>
+            </div>
+        </div>
+        <table class="scan-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Document</th>
+                    <th>Matches</th>
+                    <th>Score</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan, doc, match in recent_scans %}
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar" title="{{ scan.user.username }}">{{ scan.user.username[0].upper() }}</div>
+                                <span>{{ scan.user.username }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="document-info" title="{{ doc.title }}">
+                                <i class="fas fa-file-alt"></i>
+                                <span>{{ doc.title }}</span>
+                            </div>
+                        </td>
+                        <td>{{ match.matches_count if match else 0 }}</td>
+                        <td>
+                            <div class="similarity-score" title="Similarity Score: {{ '%.2f'|format(scan.similarity_score) if scan.similarity_score else 'N/A' }}">
+                                {% if scan.similarity_score %}
+                                    <div class="score-bar" style="width: {{ scan.similarity_score * 100 }}%"></div>
+                                    <span>{{ '%.2f'|format(scan.similarity_score) }}</span>
+                                {% else %}
+                                    <span>N/A</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="scan-time" title="{{ scan.created_at }}">
+                                {{ scan.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="#" class="btn icon-btn" title="View Details" onclick="viewScanDetails({{ scan.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="#" class="btn icon-btn" title="Download Report" onclick="downloadScanReport({{ scan.id }})">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Counter animation for statistics
+        const counters = document.querySelectorAll('.counter');
+        const speed = 200;
+        
+        function updateCounter() {
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const inc = target / speed;
+                
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCounter, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            });
+        }
+        
+        updateCounter();
+        
+        // Initialize scan activity chart
+        const ctx = document.getElementById('scan-activity-chart').getContext('2d');
+        const chartData = JSON.parse(document.getElementById('scan-activity-chart').dataset.chart);
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map(d => d.date),
+                datasets: [{
+                    label: 'Total Scans',
+                    data: chartData.map(d => d.total_scans),
+                    borderColor: '#4CAF50',
+                    backgroundColor: '#4CAF5022',
+                    fill: true
+                }, {
+                    label: 'Matches Found',
+                    data: chartData.map(d => d.matches_found),
+                    borderColor: '#2196F3',
+                    backgroundColor: '#2196F322',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Scan Activity Trends'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Real-time data refresh
+        function refreshData() {
+            fetch('/admin/dashboard', {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update statistics
+                document.querySelector('[data-target="user_count"]').dataset.target = data.stats.user_count;
+                document.querySelector('[data-target="document_count"]').dataset.target = data.stats.document_count;
+                document.querySelector('[data-target="scan_count"]').dataset.target = data.stats.scan_count;
+                document.querySelector('[data-target="pending_requests"]').dataset.target = data.stats.pending_requests;
+                document.querySelector('[data-target="match_count"]').dataset.target = data.stats.match_count;
+                
+                // Update changes
+                updateChanges(data.stats.changes);
+                
+                // Update chart
+                updateChart(data.scan_activity);
+                
+                // Animate counters
+                updateCounter();
+            })
+            .catch(error => console.error('Error refreshing data:', error));
+        }
+        
+        // Refresh data every 30 seconds
+        setInterval(refreshData, 30000);
+        
+        // Manual refresh button
+        document.getElementById('refresh-chart').addEventListener('click', refreshData);
+        
+        // Export chart as PNG
+        document.getElementById('export-chart-png').addEventListener('click', function(e) {
+            e.preventDefault();
+            const link = document.createElement('a');
+            link.download = 'scan-activity-chart.png';
+            link.href = document.getElementById('scan-activity-chart').toDataURL();
+            link.click();
+        });
+        
+        // Initialize scan search
+        document.getElementById('scan-search').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.scan-table tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

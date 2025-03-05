@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}System Settings - Document Scanner{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="section-header">
+        <h2><i class="fas fa-cog"></i> System Settings</h2>
+        <div class="breadcrumb">
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> / System Settings
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>General Settings</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.system_settings') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="site_name">Site Name</label>
+                    <input type="text" id="site_name" name="site_name" class="form-control" value="Document Scanner" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="default_credits">Default Credits for New Users</label>
+                    <input type="number" id="default_credits" name="default_credits" class="form-control" value="20" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="maintenance_mode">Maintenance Mode</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="maintenance_mode" name="maintenance_mode" class="toggle-input">
+                        <label for="maintenance_mode" class="toggle-label"></label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn primary-btn">Save Changes</button>
+                    <button type="reset" class="btn secondary-btn">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>Document Scanning Settings</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.system_settings') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="similarity_threshold">Similarity Threshold (%)</label>
+                    <input type="number" id="similarity_threshold" name="similarity_threshold" class="form-control" value="70" min="0" max="100" required>
+                    <small class="form-text">Documents with similarity score above this threshold will be considered matches</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="enable_ai_matching">Enable AI Matching</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="enable_ai_matching" name="enable_ai_matching" class="toggle-input" checked>
+                        <label for="enable_ai_matching" class="toggle-label"></label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="enable_hash_matching">Enable Hash Matching</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="enable_hash_matching" name="enable_hash_matching" class="toggle-input" checked>
+                        <label for="enable_hash_matching" class="toggle-label"></label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn primary-btn">Save Changes</button>
+                    <button type="reset" class="btn secondary-btn">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h3>Database Settings</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.system_settings') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="backup_frequency">Automatic Backup Frequency</label>
+                    <select id="backup_frequency" name="backup_frequency" class="form-control">
+                        <option value="daily">Daily</option>
+                        <option value="weekly" selected>Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="never">Never</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="backup_retention">Backup Retention (days)</label>
+                    <input type="number" id="backup_retention" name="backup_retention" class="form-control" value="30" min="1" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn primary-btn">Save Changes</button>
+                    <button type="reset" class="btn secondary-btn">Reset</button>
+                    <a href="#" class="btn warning-btn">Create Backup Now</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

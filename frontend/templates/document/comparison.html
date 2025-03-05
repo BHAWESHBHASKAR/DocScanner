@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Comparison{% endblock %}
+
+{% block content %}
+<div class="document-view">
+    <div class="view-header">
+        <h2>Document Comparison</h2>
+        <div class="view-actions">
+            <a href="{{ url_for('document.view', document_id=source_document.id) }}" class="glass-btn secondary">
+                <i class="fas fa-arrow-left"></i> Back to Document
+            </a>
+            <a href="#" class="glass-btn primary" id="export-comparison">
+                <i class="fas fa-file-export"></i> Export Report
+            </a>
+        </div>
+    </div>
+
+    <div class="document-meta-section">
+        <div class="meta-item">
+            <span class="meta-label">Match Score:</span>
+            <span class="meta-value">
+                <span class="match-badge" data-score="{{ match.ai_similarity_score }}">
+                    <!-- Will be populated by JavaScript -->
+                </span>
+            </span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Match Type:</span>
+            <span class="meta-value">{{ match.match_type }}</span>
+        </div>
+        <div class="meta-item">
+            <span class="meta-label">Detected On:</span>
+            <span class="meta-value">{{ match.created_at.strftime('%B %d, %Y at %H:%M') }}</span>
+        </div>
+    </div>
+
+    <div class="comparison-container">
+        <div class="comparison-card source-document">
+            <div class="comparison-title">
+                Source Document
+                <span class="document-info">
+                    <i class="fas fa-calendar-alt"></i> {{ source_document.created_at.strftime('%b %d, %Y') }}
+                </span>
+            </div>
+            <div class="document-meta-info">
+                <div class="meta-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{ source_document.filename }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-file-word"></i>
+                    <span>{{ source_document.word_count }} words</span>
+                </div>
+            </div>
+            <div class="comparison-content">
+                {{ source_document.content }}
+            </div>
+        </div>
+
+        <div class="comparison-card matched-document">
+            <div class="comparison-title">
+                Matched Document
+                <span class="document-info">
+                    <i class="fas fa-calendar-alt"></i> {{ matched_document.created_at.strftime('%b %d, %Y') }}
+                </span>
+            </div>
+            <div class="document-meta-info">
+                <div class="meta-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>{{ matched_document.filename }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-file-word"></i>
+                    <span>{{ matched_document.word_count }} words</span>
+                </div>
+            </div>
+            <div class="comparison-content">
+                {{ matched_document.content }}
+            </div>
+        </div>
+    </div>
+
+    <div class="match-details-section">
+        <h3>Match Details</h3>
+        <div class="match-details-card">
+            <div class="details-item">
+                <span class="details-label">AI Similarity Score:</span>
+                <span class="details-value">{{ match.ai_similarity_score }}%</span>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Traditional Similarity Score:</span>
+                <span class="details-value">{{ match.traditional_similarity_score }}%</span>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Match Type:</span>
+                <span class="details-value">{{ match.match_type }}</span>
+            </div>
+            {% if match.match_details %}
+            <div class="details-item full-width">
+                <span class="details-label">Additional Details:</span>
+                <div class="details-value details-json">
+                    <pre>{{ match.match_details | tojson(indent=2) }}</pre>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Export functionality
+        const exportBtn = document.getElementById('export-comparison');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.showLoader();
+                
+                // Simulate export process
+                setTimeout(() => {
+                    window.hideLoader();
+                    // Show success notification
+                    showNotification('Report exported successfully!', 'success');
+                }, 1500);
+            });
+        }
+        
+        // Helper function to show notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type} fade-in`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="close-btn">&times;</button>
+            `;
+            
+            // Add to notifications container
+            const container = document.querySelector('.notifications-container');
+            container.appendChild(notification);
+            
+            // Add close button functionality
+            const closeBtn = notification.querySelector('.close-btn');
+            closeBtn.addEventListener('click', () => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            });
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 5000);
+        }
+    });
+</script>
+{% endblock %}

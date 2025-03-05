@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Scanner - Home{% endblock %}
+
+{% block content %}
+<section class="hero fade-in">
+    <div class="hero-content mirror">
+        <h1>Document Scanning & Matching System</h1>
+        <p>Upload your documents and find similar matches using our advanced AI-powered system.</p>
+        {% if current_user.is_authenticated %}
+            <div class="cta-buttons">
+                <a href="{{ url_for('document.upload') }}" class="btn primary-btn">Scan Document</a>
+                <a href="{{ url_for('user.profile') }}" class="btn secondary-btn">View Profile</a>
+            </div>
+        {% else %}
+            <div class="cta-buttons">
+                <a href="{{ url_for('auth.login') }}" class="btn primary-btn">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="btn secondary-btn">Register</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="features fade-in">
+    <h2>Key Features</h2>
+    <div class="feature-cards">
+        <div class="feature-card fade-in">
+            <div class="feature-icon">📄</div>
+            <h3>Document Scanning</h3>
+            <p>Upload and scan documents to find similar matches in our database.</p>
+        </div>
+        <div class="feature-card fade-in">
+            <div class="feature-icon">🔍</div>
+            <h3>AI-Powered Matching</h3>
+            <p>Advanced DeepSeek AI technology for accurate document similarity detection.</p>
+        </div>
+        <div class="feature-card fade-in">
+            <div class="feature-icon">💳</div>
+            <h3>Credit System</h3>
+            <p>20 free scans per day with option to request additional credits.</p>
+        </div>
+        <div class="feature-card fade-in">
+            <div class="feature-icon">📊</div>
+            <h3>Analytics Dashboard</h3>
+            <p>Track your scan history and view detailed analytics.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works fade-in">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step fade-in">
+            <div class="step-number">1</div>
+            <h3>Upload Document</h3>
+            <p>Upload your text document to our secure system.</p>
+            <div id="drop-area" class="drop-area">
+                <p>Drag & drop your files here or click to upload.</p>
+                <input type="file" id="file-input" class="file-input" multiple />
+            </div>
+            <div id="file-name" class="file-name"></div>
+        </div>
+        <div class="step fade-in">
+            <div class="step-number">2</div>
+            <h3>AI Processing</h3>
+            <p>Our AI analyzes the document content for similarity matching.</p>
+        </div>
+        <div class="step fade-in">
+            <div class="step-number">3</div>
+            <h3>View Results</h3>
+            <p>Get instant results showing similar documents with match percentages.</p>
+        </div>
+        <div class="step fade-in">
+            <div class="step-number">4</div>
+            <h3>Track History</h3>
+            <p>Access your scan history and analytics from your profile.</p>
+        </div>
+    </div>
+</section>
+{% endblock %} 

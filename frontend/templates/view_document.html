@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}View Document - Document Scanner{% endblock %}
+
+{% block content %}
+<section class="document-view">
+    <h2>{{ document.title }}</h2>
+    
+    <div class="document-meta-info">
+        <p><strong>Uploaded:</strong> {{ document.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><strong>Owner:</strong> {{ document.owner.username }}</p>
+    </div>
+    
+    <h3>Document Content</h3>
+    <div class="document-content">
+        {{ document.content }}
+    </div>
+    
+    <div class="matches-section">
+        <h3>Similar Documents</h3>
+        
+        {% if matches %}
+            <div class="match-list">
+                {% for match in matches %}
+                    {% set matched_doc = match.matched_document %}
+                    {% set score = match.similarity_score %}
+                    {% set match_type = match.match_type %}
+                    
+                    <div class="match-card">
+                        <div class="match-info">
+                            <h4>{{ matched_doc.title }}</h4>
+                            <p>Uploaded by {{ matched_doc.owner.username }} on {{ matched_doc.created_at.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                        
+                        <div class="match-details">
+                            <div class="match-score {% if match_type == 'exact' %}exact{% elif match_type == 'high' %}high{% elif match_type == 'medium' %}medium{% else %}low{% endif %}">
+                                {{ "%.2f"|format(score * 100) }}% Match
+                            </div>
+                            
+                            <div class="match-type">
+                                {% if match_type == 'exact' %}
+                                    <span class="badge exact">Exact Match</span>
+                                {% elif match_type == 'high' %}
+                                    <span class="badge high">High Similarity</span>
+                                {% elif match_type == 'medium' %}
+                                    <span class="badge medium">Medium Similarity</span>
+                                {% else %}
+                                    <span class="badge low">Low Similarity</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <a href="{{ url_for('document.view', doc_id=matched_doc.id) }}" class="btn small-btn">View</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No similar documents found.</p>
+        {% endif %}
+    </div>
+    
+    <div class="document-actions">
+        <a href="{{ url_for('document.matches', doc_id=document.id) }}" class="btn secondary-btn">View All Matches</a>
+        <a href="{{ url_for('user.profile') }}" class="btn secondary-btn">Back to Profile</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Visualize similarity scores
+        {% for match in matches %}
+            visualizeSimilarity('similarity-{{ match.id }}', {{ match.similarity_score }});
+        {% endfor %}
+    });
+</script>
+{% endblock %}

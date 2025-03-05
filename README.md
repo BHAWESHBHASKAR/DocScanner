@@ -4,9 +4,9 @@ A modern web application that uses AI to detect similarities between documents, 
 
 ## 🎥 Demo
 
-[![Document Scanner Demo](screenshots/demo-thumbnail.png)](Screencast%20from%202025-03-06%2001-45-41.mp4)
+https://user-images.githubusercontent.com/YOUR_USER_ID/DocScanner/assets/demo/Screencast-2025-03-06-01-45-41.mp4
 
-Click the image above to watch the demo video showing how to use the application.
+Watch the demo video above to see how to use the application.
 
 ## ✨ Features
 
@@ -195,4 +195,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - LinkedIn: [bhawesh-bhaskar](https://www.linkedin.com/in/bhawesh-bhaskar)
 - GitHub: [BHAWESHBHASKAR](https://github.com/BHAWESHBHASKAR)
 - Email: bhaskarbhawesh09@gmail.com
-- Phone: +91 7321080882
+

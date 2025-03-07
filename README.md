@@ -215,3 +215,54 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - GitHub: [BHAWESHBHASKAR](https://github.com/BHAWESHBHASKAR)
 - Email: bhaskarbhawesh09@gmail.com
 
+## 📋 Sample Documents and Testing
+
+The repository includes sample documents in the `sample_documents` directory to help you test the similarity detection features:
+
+### Test Documents:
+1. `ai_doc1.txt` and `ai_doc2.txt`:
+   - Similar documents about artificial intelligence
+   - Expected similarity score: ~70-80%
+   - Use these to test semantic similarity detection
+
+2. `climate_doc.txt`:
+   - Different topic (climate change)
+   - Expected similarity score with AI docs: <30%
+   - Use this to verify dissimilar content detection
+
+### Quick Testing Steps:
+1. After setting up the application:
+   - Login with admin credentials
+   - Upload `ai_doc1.txt`
+   - Then upload `ai_doc2.txt`
+   - You should see a high similarity score
+   - Upload `climate_doc.txt` to verify low similarity detection
+
+2. Testing Features:
+   - Document comparison view
+   - Similarity scores
+   - Match highlighting
+   - Credit system functionality
+
+### Expected Results:
+- High similarity between AI documents demonstrates semantic matching
+- Low similarity with climate document shows accurate differentiation
+- System should identify key phrases and concepts
+- Match details should show relevant text comparisons
+
+## 🧪 Test Credentials
+
+For testing purposes, use these credentials:
+
+### Admin Account:
+- Username: admin
+- Password: admin
+- Email: admin@example.com
+
+### Regular User Account:
+- Username: testuser
+- Password: testpass123
+- Email: test@example.com
+
+Note: Please change these credentials in a production environment.
+

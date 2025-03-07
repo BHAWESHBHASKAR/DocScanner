@@ -201,9 +201,6 @@ For complete API documentation, see the [API Documentation](docs/API.md).
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 👥 Authors
 
@@ -264,5 +261,4 @@ For testing purposes, use these credentials:
 - Password: testpass123
 - Email: test@example.com
 
-Note: Please change these credentials in a production environment.
 

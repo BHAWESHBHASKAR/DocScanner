@@ -6,6 +6,8 @@ A modern web application that uses AI to detect similarities between documents, 
 
 https://user-images.githubusercontent.com/assets/cec76d33-fe0b-444d-85c4-23d62d6988ff
 
+![Demo Video](https://user-images.githubusercontent.com/assets/cec76d33-fe0b-444d-85c4-23d62d6988ff)
+
 Watch the demo video above to see how to use the application.
 
 ## ✨ Features
@@ -43,13 +45,30 @@ Watch the demo video above to see how to use the application.
 - Python 3.8 or higher
 - pip (Python package manager)
 - Virtual environment (recommended)
+- API keys for OpenRouter (DeepSeek) and Mistral AI
+
+### API Keys Setup
+
+#### OpenRouter (for DeepSeek AI) API Key:
+1. Go to [OpenRouter.ai](https://openrouter.ai/) and create an account
+2. After logging in, navigate to the API Keys section
+3. Click "Create API Key" and give it a name related to this project
+4. Copy the generated API key (starts with "sk-or-v1-...")
+5. Add this key to your `.env` file as `OPENROUTER_API_KEY`
+
+#### Mistral AI API Key:
+1. Visit [Mistral AI Platform](https://console.mistral.ai/) and create an account
+2. Go to the API section in your dashboard
+3. Generate a new API key
+4. Copy the API key (starts with a unique identifier)
+5. Add this key to your `.env` file as `MISTRAL_API_KEY`
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/document-scanner.git
-   cd document-scanner
+   git clone https://github.com/BHAWESHBHASKAR/DocScanner.git
+   cd DocScanner
    ```
 
 2. Create and activate a virtual environment:
@@ -68,9 +87,9 @@ Watch the demo video above to see how to use the application.
    cp .env.example .env
    ```
    Update the following variables in `.env`:
-   - SECRET_KEY: Your Flask secret key
-   - OPENROUTER_API_KEY: Your OpenRouter API key
-   - MISTRAL_API_KEY: Your Mistral AI API key
+   - SECRET_KEY: Your Flask secret key (a random string for security)
+   - OPENROUTER_API_KEY: Your OpenRouter API key from the steps above
+   - MISTRAL_API_KEY: Your Mistral AI API key from the steps above
 
 5. Initialize the database:
    ```bash
